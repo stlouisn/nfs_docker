@@ -6,29 +6,28 @@ COPY rootfs /
 
 RUN \
 
-    # Create transmission group
+    # Create docker-g group
     groupadd \
         --system \
-        --gid 10000 \
-        transmission && \
+        --gid 9999 \
+        docker-g && \
 
-    # Create transmission user
+    # Create docker-u user
     useradd \
         --system \
         --no-create-home \
         --shell /sbin/nologin \
-        --comment transmission \
-        --gid 10000 \
-        --uid 10000 \
-        transmission && \
+        --comment 'docker user' \
+        --gid 9999 \
+        --uid 9999 \
+        docker-u && \
 
     # Update apt-cache
     apt-get update && \
 
-    # Install transmission-client
+    # Install nfs-kernel-server
     apt-get install -y --no-install-recommends -o "Dpkg::Options::=--force-confold" \
-        transmission-cli \
-        transmission-daemon && \
+        nfs-kernel-server && \
 
     # Clean apt-cache
     apt-get autoremove -y --purge && \
@@ -49,5 +48,7 @@ RUN \
         /var/log/*
 
 VOLUME /config
+
+EXPOSE 2049
 
 ENTRYPOINT ["/usr/local/bin/docker_entrypoint.sh"]
